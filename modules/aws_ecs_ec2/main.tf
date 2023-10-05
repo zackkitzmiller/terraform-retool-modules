@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
   }
 }
@@ -65,7 +65,7 @@ resource "aws_launch_configuration" "this" {
 
   # Allow the EC2 instances to access AWS resources on your behalf, using this instance profile and the permissions defined there
   iam_instance_profile = aws_iam_instance_profile.ec2.arn
-  
+
   lifecycle {
     create_before_destroy = true
   }
@@ -156,7 +156,7 @@ resource "aws_db_instance" "this" {
   publicly_accessible          = var.rds_publicly_accessible
   vpc_security_group_ids       = [aws_security_group.rds.id]
   performance_insights_enabled = var.rds_performance_insights_enabled
-  
+
   skip_final_snapshot          = true
   apply_immediately           = true
 }

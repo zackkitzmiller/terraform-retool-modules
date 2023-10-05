@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0"
+      version = "~> 5.0"
     }
   }
 }
@@ -35,7 +35,7 @@ resource "aws_db_instance" "this" {
   vpc_security_group_ids       = [aws_security_group.rds.id]
   db_subnet_group_name         = aws_db_subnet_group.this.id
   performance_insights_enabled = var.rds_performance_insights_enabled
-  
+
   skip_final_snapshot          = true
   apply_immediately           = true
 }
@@ -65,7 +65,7 @@ resource "aws_ecs_service" "retool" {
   dynamic "network_configuration" {
     for_each = var.launch_type == "FARGATE" ? toset([1]) : toset([])
 
-    content {    
+    content {
       subnets = var.subnet_ids
       security_groups = [
         aws_security_group.containers.id
@@ -92,7 +92,7 @@ resource "aws_ecs_service" "jobs_runner" {
 
     for_each = var.launch_type == "FARGATE" ? toset([1]) : toset([])
 
-    content {    
+    content {
       subnets = var.subnet_ids
       security_groups = [
         aws_security_group.containers.id
@@ -108,7 +108,7 @@ resource "aws_ecs_service" "workflows_backend" {
   cluster         = aws_ecs_cluster.this.id
   desired_count   = 1
   task_definition = aws_ecs_task_definition.retool_workflows_backend[0].arn
-  
+
   # Need to explictly set this in aws_ecs_service to avoid destructive behavior: https://github.com/hashicorp/terraform-provider-aws/issues/22823
   capacity_provider_strategy {
     base              = 1
@@ -123,7 +123,7 @@ resource "aws_ecs_service" "workflows_backend" {
 
     for_each = var.launch_type == "FARGATE" ? toset([1]) : toset([])
 
-    content {    
+    content {
       subnets = var.subnet_ids
       security_groups = [
         aws_security_group.containers.id
@@ -150,7 +150,7 @@ resource "aws_ecs_service" "workflows_worker" {
 
     for_each = var.launch_type == "FARGATE" ? toset([1]) : toset([])
 
-    content {    
+    content {
       subnets = var.subnet_ids
       security_groups = [
         aws_security_group.containers.id
@@ -387,7 +387,7 @@ resource "aws_service_discovery_private_dns_namespace" "retoolsvc" {
   vpc         = var.vpc_id
 }
 
-resource "aws_service_discovery_service" "retool_workflow_backend_service" { 
+resource "aws_service_discovery_service" "retool_workflow_backend_service" {
   count = var.workflows_enabled ? 1 : 0
   name  = "workflow-backend"
 
@@ -410,7 +410,7 @@ resource "aws_service_discovery_service" "retool_workflow_backend_service" {
 module "temporal" {
   count = var.workflows_enabled && !var.use_exising_temporal_cluster ? 1 : 0
   source = "./temporal"
-  
+
   deployment_name   = "${var.deployment_name}-temporal"
   vpc_id = var.vpc_id
   subnet_ids = var.subnet_ids
