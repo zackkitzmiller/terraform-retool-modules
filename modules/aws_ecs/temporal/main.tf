@@ -1,6 +1,6 @@
 module "temporal_aurora_rds" {
   source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "8.0.2"
+  version = "8.3.1"
 
   name="${var.deployment_name}-temporal-rds-instance"
   engine            = "aurora-postgresql"
@@ -40,7 +40,7 @@ module "temporal_aurora_rds" {
   }
 }
 
-resource "aws_service_discovery_service" "temporal_frontend_service" { 
+resource "aws_service_discovery_service" "temporal_frontend_service" {
   name  = "temporal"
 
   dns_config {
@@ -85,7 +85,7 @@ resource "aws_ecs_service" "retool_temporal" {
   dynamic "network_configuration" {
     for_each = var.launch_type == "FARGATE" ? toset([1]) : toset([])
 
-    content {    
+    content {
       subnets = var.subnet_ids
       security_groups = [
         var.container_sg_id
